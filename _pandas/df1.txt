@@ -1,0 +1,6 @@
+{ "arrivalDate": 1493611200000, "price": 4588 },
+{ "arrivalDate": 1493352000000, "price": 4630 },
+{ "arrivalDate": 1493179200000, "price": 4553 },
+{ "arrivalDate": 1493092800000, "price": 4530 },
+{ "arrivalDate": 1493006400000, "price": 4578 },
+{ "arrivalDate": 1490572800000, "price": 4457 }
