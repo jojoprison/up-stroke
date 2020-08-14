@@ -1,2 +1,1 @@
-# pip install gamesbyexample
-# python -m gamesbyexample
+# python -m gemasbyexample
