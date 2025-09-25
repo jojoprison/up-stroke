@@ -1,0 +1,7 @@
+lst = [2, 3, 5, 8, 99]
+comp = 1
+for i in lst:
+    if i % 5 == 0:
+        comp *= i
+
+print(comp)
