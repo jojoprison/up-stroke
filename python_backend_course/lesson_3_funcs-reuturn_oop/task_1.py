@@ -46,7 +46,21 @@ print(dict_1)
 
 
 
-
-
 set_1 = {1, 2, 3}
+print(set_1)
+print(type(set_1))
 
+set_1.add(4)
+print(set_1)
+
+set_1.add(1)
+print(set_1)
+
+set_1.remove(1)
+print(set_1)
+
+set_1.remove(1)
+print(set_1)
+
+# написать функцию, которая будет принимать словарь user_data
+# и обновлять в нем имя, переданное в качестве параметра
