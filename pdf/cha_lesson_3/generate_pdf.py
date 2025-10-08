@@ -16,6 +16,7 @@ if str(BASE_DIR) not in sys.path:
 
 from pages_txt_fixed import part_1, part_2, part_3, part_4, part_5, part_6, \
     part_7  # type: ignore
+from ru_translations import RU_MAP  # type: ignore
 
 
 def split_part4(p4: str) -> tuple[str, str]:
@@ -161,6 +162,24 @@ def make_text_pdf(blocks: List[str], out_path: Path,
                                              seg_start, underline_pats,
                                              bold_on_matches)
                 y -= line_height
+            # после исходной строки — перевод в скобках курсивом (если есть)
+            ru = RU_MAP.get(line.strip())
+            if ru is not None:
+                tr_text = f"({ru})"
+                tr_lines = textwrap.wrap(tr_text, width=max_chars,
+                                         break_long_words=True,
+                                         break_on_hyphens=False)
+                if not tr_lines:
+                    tr_lines = [""]
+                for tr in tr_lines:
+                    if y < margin_y:
+                        c.showPage();
+                        c.setFont("Courier", 11);
+                        y = h - margin_y
+                    c.setFont("Courier-Oblique", 11)
+                    c.drawString(margin_x, y, tr)
+                    c.setFont("Courier", 11)
+                    y -= line_height
         if i < len(blocks):
             c.showPage();
             c.setFont("Courier", 11)
