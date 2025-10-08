@@ -7,6 +7,7 @@ from typing import List
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 # Импортируем тексты из соседнего файла с пунктуацией
@@ -37,13 +38,52 @@ def split_part4(p4: str) -> tuple[str, str]:
 
 def make_text_pdf(blocks: List[str], out_path: Path,
                   break_before: list[list[str]] | None = None) -> Path:
+    # Зарегистрируем Unicode-шрифты (моноширинные) с поддержкой кириллицы
+    def register_mono_fonts() -> tuple[str, str, str]:
+        candidates = [
+            (
+                [
+                    "/Library/Fonts/Courier New.ttf",
+                    "/System/Library/Fonts/Supplemental/Courier New.ttf",
+                ],
+                [
+                    "/Library/Fonts/Courier New Bold.ttf",
+                    "/System/Library/Fonts/Supplemental/Courier New Bold.ttf",
+                ],
+                [
+                    "/Library/Fonts/Courier New Italic.ttf",
+                    "/System/Library/Fonts/Supplemental/Courier New Italic.ttf",
+                ],
+                ("CNR", "CNR-Bold", "CNR-Italic"),
+            ),
+        ]
+        for reg_paths, bold_paths, ital_paths, names in candidates:
+            try:
+                reg_path = next(p for p in reg_paths if Path(p).exists())
+                bold_path = next(p for p in bold_paths if Path(p).exists())
+                ital_path = next(p for p in ital_paths if Path(p).exists())
+            except StopIteration:
+                continue
+            base, bold, ital = names
+            if base not in pdfmetrics.getRegisteredFontNames():
+                pdfmetrics.registerFont(TTFont(base, reg_path))
+            if bold not in pdfmetrics.getRegisteredFontNames():
+                pdfmetrics.registerFont(TTFont(bold, bold_path))
+            if ital not in pdfmetrics.getRegisteredFontNames():
+                pdfmetrics.registerFont(TTFont(ital, ital_path))
+            return names
+        # Фолбэк (непочинит кириллицу, но не упадём)
+        return ("Courier", "Courier-Bold", "Courier-Oblique")
+
+    FONT_REG, FONT_BOLD, FONT_ITAL = register_mono_fonts()
+
     c = canvas.Canvas(str(out_path), pagesize=A4)
     w, h = A4
     margin_x, margin_y = 20 * mm, 20 * mm
     line_height = 14
-    c.setFont("Courier", 11)
+    c.setFont(FONT_REG, 11)
     # рассчитаем максимально допустимое количество символов в строке для правого отступа
-    char_w = pdfmetrics.stringWidth("M", "Courier", 11)
+    char_w = pdfmetrics.stringWidth("M", FONT_REG, 11)
     max_width = w - 2 * margin_x
     max_chars = max(1, int(max_width // char_w))
     # Компилируем правила ручных переносов страниц до строк
@@ -86,7 +126,7 @@ def make_text_pdf(blocks: List[str], out_path: Path,
                                      underline_pats: list[re.Pattern],
                                      bold_on_matches: bool):
         # отрисуем сегмент обычным шрифтом
-        c.setFont("Courier", 11)
+        c.setFont(FONT_REG, 11)
         c.drawString(base_x, y_pos, seg_text)
         if not underline_pats:
             return
@@ -112,9 +152,9 @@ def make_text_pdf(blocks: List[str], out_path: Path,
             c.line(x1, y_pos - 1.5, x2, y_pos - 1.5)
             if bold_on_matches:
                 # нарисуем поверх выделенный фрагмент полужирным
-                c.setFont("Courier-Bold", 11)
+                c.setFont(FONT_BOLD, 11)
                 c.drawString(x1, y_pos, seg_text[rel_start:rel_end])
-                c.setFont("Courier", 11)
+                c.setFont(FONT_REG, 11)
 
     for i, block in enumerate(blocks, start=1):
         y = h - margin_y
@@ -124,14 +164,14 @@ def make_text_pdf(blocks: List[str], out_path: Path,
                 y -= line_height
                 if y < margin_y:
                     c.showPage();
-                    c.setFont("Courier", 11);
+                    c.setFont(FONT_REG, 11);
                     y = h - margin_y
                 continue
             # Ручной перенос страницы перед заданной строкой (например, перед "21.")
             if comp_breaks[i - 1] and any(p.match(line) for p in comp_breaks[
                 i - 1]) and y != h - margin_y:
                 c.showPage();
-                c.setFont("Courier", 11);
+                c.setFont(FONT_REG, 11);
                 y = h - margin_y
 
             # Определим подчёркивание/полужирный для part_7 (26-30)
@@ -150,19 +190,18 @@ def make_text_pdf(blocks: List[str], out_path: Path,
                         underline_pats = compiled_ul[
                             current_item]  # в вариантах — только подчёрк.
                         bold_on_matches = False
-
             # перенос по правому краю с тем же отступом, используя моноширинный шрифт
             wrapped_with_idx = wrap_with_indices(line, max_chars)
             for seg_text, seg_start in wrapped_with_idx:
                 if y < margin_y:
                     c.showPage();
-                    c.setFont("Courier", 11);
+                    c.setFont(FONT_REG, 11)
                     y = h - margin_y
+                c.setFont(FONT_REG, 11)
                 draw_with_optional_underline(margin_x, y, line, seg_text,
                                              seg_start, underline_pats,
                                              bold_on_matches)
                 y -= line_height
-            # после исходной строки — перевод в скобках курсивом (если есть)
             ru = RU_MAP.get(line.strip())
             if ru is not None:
                 tr_text = f"({ru})"
@@ -174,15 +213,15 @@ def make_text_pdf(blocks: List[str], out_path: Path,
                 for tr in tr_lines:
                     if y < margin_y:
                         c.showPage();
-                        c.setFont("Courier", 11);
+                        c.setFont(FONT_REG, 11);
                         y = h - margin_y
-                    c.setFont("Courier-Oblique", 11)
+                    c.setFont(FONT_ITAL, 11)
                     c.drawString(margin_x, y, tr)
-                    c.setFont("Courier", 11)
+                    c.setFont(FONT_REG, 11)
                     y -= line_height
         if i < len(blocks):
             c.showPage();
-            c.setFont("Courier", 11)
+            c.setFont(FONT_REG, 11)
     c.save()
     return out_path
 
