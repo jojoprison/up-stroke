@@ -34,7 +34,8 @@ def split_part4(p4: str) -> tuple[str, str]:
     return p4_9_12, p4_13_15
 
 
-def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
+def make_text_pdf(blocks: List[str], out_path: Path,
+                  break_before: list[list[str]] | None = None) -> Path:
     c = canvas.Canvas(str(out_path), pagesize=A4)
     w, h = A4
     margin_x, margin_y = 20 * mm, 20 * mm
@@ -44,14 +45,24 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
     char_w = pdfmetrics.stringWidth("M", "Courier", 11)
     max_width = w - 2 * margin_x
     max_chars = max(1, int(max_width // char_w))
-    # карта подчеркиваний для заданий 26-30 (только в строке вопроса)
-    underline_map = {
-        "26": ["handled"],
-        "27": ["position"],
-        "28": ["active"],
-        "29": ["learn"],
-        "30": ["currents"],
+    # Компилируем правила ручных переносов страниц до строк
+    comp_breaks: list[list[re.Pattern]] = []
+    if break_before is None:
+        comp_breaks = [[] for _ in blocks]
+    else:
+        comp_breaks = [[re.compile(p) for p in group] for group in break_before]
+
+    # Карта подчёркиваний для заданий 26-30.
+    # В вопросе: подчёркивание + полужирный; в вариантах: только подчёркивание.
+    underline_patterns_map = {
+        "26": [r"handle(?:d)?"],
+        "27": [r"position"],
+        "28": [r"active"],
+        "29": [r"learn(?:ed)?"],
+        "30": [r"currents?"],
     }
+    compiled_ul = {k: [re.compile(rf"\\b{p}\\b", re.IGNORECASE) for p in v] for
+                   k, v in underline_patterns_map.items()}
 
     def wrap_with_indices(text: str, width: int) -> list[tuple[str, int]]:
         wrapped = textwrap.wrap(text, width=width, break_long_words=True,
@@ -71,15 +82,17 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
     def draw_with_optional_underline(base_x: float, y_pos: float,
                                      full_line: str, seg_text: str,
                                      seg_start: int,
-                                     underline_words: list[str]):
+                                     underline_pats: list[re.Pattern],
+                                     bold_on_matches: bool):
+        # отрисуем сегмент обычным шрифтом
+        c.setFont("Courier", 11)
         c.drawString(base_x, y_pos, seg_text)
-        if not underline_words:
+        if not underline_pats:
             return
         # найдем диапазоны в полной строке
         ranges: list[tuple[int, int]] = []
-        for w in underline_words:
-            for m in re.finditer(rf"\b{re.escape(w)}\b", full_line,
-                                 flags=re.IGNORECASE):
+        for pat in underline_pats:
+            for m in pat.finditer(full_line):
                 ranges.append((m.start(), m.end()))
         if not ranges:
             return
@@ -96,9 +109,15 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
             x2 = base_x + rel_end * char_w
             c.setLineWidth(0.6)
             c.line(x1, y_pos - 1.5, x2, y_pos - 1.5)
+            if bold_on_matches:
+                # нарисуем поверх выделенный фрагмент полужирным
+                c.setFont("Courier-Bold", 11)
+                c.drawString(x1, y_pos, seg_text[rel_start:rel_end])
+                c.setFont("Courier", 11)
 
     for i, block in enumerate(blocks, start=1):
         y = h - margin_y
+        current_item: str | None = None  # для part_7 (26-30)
         for line in block.splitlines():
             if line.strip() == "":
                 y -= line_height
@@ -107,12 +126,29 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
                     c.setFont("Courier", 11);
                     y = h - margin_y
                 continue
-            # определим, нужно ли подчеркивание (только для блока part_7 и строк 26-30)
-            underline_words: list[str] = []
+            # Ручной перенос страницы перед заданной строкой (например, перед "21.")
+            if comp_breaks[i - 1] and any(p.match(line) for p in comp_breaks[
+                i - 1]) and y != h - margin_y:
+                c.showPage();
+                c.setFont("Courier", 11);
+                y = h - margin_y
+
+            # Определим подчёркивание/полужирный для part_7 (26-30)
+            underline_pats: list[re.Pattern] = []
+            bold_on_matches = False
             if i == len(blocks):  # последний блок = part_7
-                m = re.match(r"\s*(\d{2})\.", line)
-                if m and m.group(1) in underline_map:
-                    underline_words = underline_map[m.group(1)]
+                m_item = re.match(r"\s*(\d{2})\.", line)
+                if m_item:
+                    current_item = m_item.group(1)
+                    if current_item in compiled_ul:
+                        underline_pats = compiled_ul[current_item]
+                        bold_on_matches = True  # в строке вопроса — полужирный
+                else:
+                    if current_item and re.match(r"\s*[1-5]\.",
+                                                 line) and current_item in compiled_ul:
+                        underline_pats = compiled_ul[
+                            current_item]  # в вариантах — только подчёрк.
+                        bold_on_matches = False
 
             # перенос по правому краю с тем же отступом, используя моноширинный шрифт
             wrapped_with_idx = wrap_with_indices(line, max_chars)
@@ -122,7 +158,8 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
                     c.setFont("Courier", 11);
                     y = h - margin_y
                 draw_with_optional_underline(margin_x, y, line, seg_text,
-                                             seg_start, underline_words)
+                                             seg_start, underline_pats,
+                                             bold_on_matches)
                 y -= line_height
         if i < len(blocks):
             c.showPage();
@@ -144,14 +181,21 @@ if __name__ == "__main__":
     # 4) 13-15 на следующей
     page_4 = p4_13_15.strip("\n") if p4_13_15 else ""
 
-    # Далее — остальное сплошником, каждый блок с новой страницы
-    other_blocks = [part_5, part_6, part_7]
+    # Далее — остальное: объединяем 16–25 (part_5 + part_6) в один блок
+    # и делаем ручной разрыв страницы перед 21., чтобы 21 начиналось с новой страницы,
+    # а 22 и далее шли на той же странице
+    combined_16_25 = (part_5.strip("\n") + "\n" + part_6.strip("\n")).strip(
+        "\n")
 
     blocks: List[str] = [page_1, page_2, page_3]
     if page_4:
         blocks.append(page_4)
-    blocks.extend([b.strip("\n") for b in other_blocks])
+    blocks.append(combined_16_25)
+    blocks.append(part_7.strip("\n"))
 
-    out_pdf = BASE_DIR / "CHA_Lesson_3_Text_grouped_wrapped.pdf"
-    make_text_pdf(blocks, out_pdf)
+    out_pdf = BASE_DIR / "CHA_Lesson_3_Text_final.pdf"
+    break_rules = [[] for _ in blocks]
+    combined_idx = len(blocks) - 2  # позиция combined_16_25
+    break_rules[combined_idx] = [r"\s*21\."]
+    make_text_pdf(blocks, out_pdf, break_rules)
     print(f"✅ Готово: {out_pdf.resolve()}")
