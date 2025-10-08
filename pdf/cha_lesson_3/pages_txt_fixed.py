@@ -1,10 +1,3 @@
-from pathlib import Path
-from typing import List
-
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import mm
-from reportlab.pdfgen import canvas
-
 # Исправленные тексты (сопоставлены с изображениями pdf/1.jpg ... 6.jpg)
 # Форматирование простое: сохраняем строки и пустые строки, используем моноширинный шрифт.
 
@@ -101,37 +94,29 @@ Amy: Not unless you want to die!
 '''
 
 part_4 = '''
-9.
+9.  1. What's the story
+    2. What's missing
+    3. What's the point
+    4. What's going on
+    5. What's the relationship
 
-1. What's the story
-2. What's missing
-3. What's the point
-4. What's going on
-5. What's the relationship
+10. 1. let him down
+    2. stand him anymore
+    3. figure him out
+    4. wait for him anymore
+    5. apologize to him
 
-10.
+11. 1. show up
+    2. step in
+    3. hang in there
+    4. stay still
+    5. be more patient
 
-1. let him down
-2. stand him anymore
-3. figure him out
-4. wait for him anymore
-5. apologize to him
-
-11.
-
-1. show up
-2. step in
-3. hang in there
-4. stay still
-5. be more patient
-
-12.
-
-1. keep my head cool
-2. keep pushing it
-3. keep my mouth shut
-4. keep pressuring it
-5. keep my fingers crossed
+12. 1. keep my head cool
+    2. keep pushing it
+    3. keep my mouth shut
+    4. keep pressuring it
+    5. keep my fingers crossed
 
 13-15:
 
@@ -141,29 +126,23 @@ Jan: ____14____! Many people might drop the class and then there will be some op
 Gary: I hope so.
 Jan: Come on, cheer up. Don't worry so much. ____15____.
 
-13.
+13. 1. I might drop out
+    2. chances are probably slim
+    3. I should forget about it
+    4. it's time to consider another class
+    5. I have no opportunities
 
-1. I might drop out
-2. chances are probably slim
-3. I should forget about it
-4. it's time to consider another class
-5. I have no opportunities
+14. 1. I wouldn't care
+    2. I wouldn't try
+    3. I wouldn't bother
+    4. I wouldn't dare
+    5. I wouldn't say that
 
-14.
-
-1. I wouldn't care
-2. I wouldn't try
-3. I wouldn't bother
-4. I wouldn't dare
-5. I wouldn't say that
-
-15.
-
-1. I believe in it
-2. Everything will change
-3. You're hopeless
-4. Everything will work out just fine
-5. Just leave it to chance
+15. 1. I believe in it
+    2. Everything will change
+    3. You're hopeless
+    4. Everything will work out just fine
+    5. Just leave it to chance
 '''
 
 part_5 = '''
@@ -298,41 +277,3 @@ Choose the alternative which has the same meaning as the underlined word in the 
 4. Magnetic fields are produced by currents flowing in the cables.
 5. The battery supplies current for the operation of the starting motor.
 '''
-
-
-def make_text_pdf(text_blocks: List[str], out_path: Path) -> Path:
-    c = canvas.Canvas(str(out_path), pagesize=A4)
-    w, h = A4
-    margin_x, margin_y = 20 * mm, 20 * mm
-    line_height = 14
-    c.setFont("Courier", 11)
-
-    for block_idx, block in enumerate(text_blocks, start=1):
-        y = h - margin_y
-        for line in block.splitlines():
-            if line.strip() == "":
-                y -= line_height
-                if y < margin_y:
-                    c.showPage();
-                    c.setFont("Courier", 11);
-                    y = h - margin_y
-                continue
-            if y < margin_y:
-                c.showPage();
-                c.setFont("Courier", 11);
-                y = h - margin_y
-            c.drawString(margin_x, y, line)
-            y -= line_height
-        if block_idx < len(text_blocks):
-            c.showPage();
-            c.setFont("Courier", 11)
-    c.save()
-    return out_path
-
-
-if __name__ == "__main__":
-    base = Path(__file__).parent
-    out_pdf = base / "CHA_Lesson_3_Text_punct_v2.pdf"
-    parts = [part_1, part_2, part_3, part_4, part_5, part_6, part_7]
-    make_text_pdf(parts, out_pdf)
-    print(f"✅ Готово: {out_pdf.resolve()}")
