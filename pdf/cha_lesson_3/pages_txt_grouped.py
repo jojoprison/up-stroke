@@ -11,7 +11,8 @@ BASE_DIR = Path(__file__).parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
 
-from pages_txt_fixed import part_1, part_2, part_3, part_4, part_5, part_6, part_7  # type: ignore
+from pages_txt_fixed import part_1, part_2, part_3, part_4, part_5, part_6, \
+    part_7  # type: ignore
 
 
 def split_part4(p4: str) -> tuple[str, str]:
@@ -25,7 +26,8 @@ def split_part4(p4: str) -> tuple[str, str]:
     if idx == -1:
         return p4, ""
     p4_9_12 = p4[:idx].rstrip()
-    p4_13_15 = p4[idx + 1 :].lstrip()  # сохраняем заголовок '13-15' в начале второй части
+    p4_13_15 = p4[
+        idx + 1:].lstrip()  # сохраняем заголовок '13-15' в начале второй части
     return p4_9_12, p4_13_15
 
 
@@ -42,14 +44,19 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
             if line.strip() == "":
                 y -= line_height
                 if y < margin_y:
-                    c.showPage(); c.setFont("Courier", 11); y = h - margin_y
+                    c.showPage();
+                    c.setFont("Courier", 11);
+                    y = h - margin_y
                 continue
             if y < margin_y:
-                c.showPage(); c.setFont("Courier", 11); y = h - margin_y
+                c.showPage();
+                c.setFont("Courier", 11);
+                y = h - margin_y
             c.drawString(margin_x, y, line)
             y -= line_height
         if i < len(blocks):
-            c.showPage(); c.setFont("Courier", 11)
+            c.showPage();
+            c.setFont("Courier", 11)
     c.save()
     return out_path
 
