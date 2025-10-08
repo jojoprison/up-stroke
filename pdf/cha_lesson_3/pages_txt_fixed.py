@@ -52,7 +52,8 @@ Choose the best answer.
 '''
 
 part_2 = '''
-5-8
+5-8:
+
 Lucy: You look tired. ____5____ last night?
 Paul: No. I had a bunch of my friends over and we partied until the wee hours.
 Lucy: ____6____ you look so bad!
@@ -87,7 +88,8 @@ Lucy: Don't worry. I'll ____8____. But next time, watch the partying, OK?
 '''
 
 part_3 = '''
-9-12
+9-12:
+
 Amy: ____9____ between you and Brian? Did you guys have a fight or something?
 John: I can't ____10____. He has such a short fuse that even a little piece of friendly advice sets him off.
 Amy: So what did you tell him?
@@ -127,7 +129,8 @@ part_4 = '''
 4. keep pressuring it
 5. keep my fingers crossed
 
-13-15
+13-15:
+
 Jan: Gary, you look so worried. What happened?
 Gary: Well, I want to get into that class, but I just found out that there are so many people on the waiting list. I guess ____13____.
 Jan: ____14____! Many people might drop the class and then there will be some openings. You never know.
@@ -162,6 +165,7 @@ Items 16-25: Meaning in Context
 Choose the best alternative to make the sentence(s) meaningful.
 
 16. Experiments are often ____ in a laboratory under controlled conditions.
+
 1. discussed
 2. debated
 3. conducted
@@ -169,6 +173,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 5. mentioned
 
 17. The greatest physical ____ between humans and apes is the hollow space humans have under their chins.
+
 1. danger
 2. comfort
 3. therapy
@@ -176,6 +181,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 5. attraction
 
 18. ____, only two students signed up to help the children at the orphanage. However, more students signed up later on.
+
 1. Initially
 2. Certainly
 3. Basically
@@ -183,6 +189,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 5. Eventually
 
 19. To ____ discipline, the principal punishes students who are late for school by making them clean the canteen on Saturday.
+
 1. enforce
 2. accept
 3. monitor
@@ -190,6 +197,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 5. implement
 
 20. The football match was ____ as most of the players had fallen ill.
+
 1. called away
 2. called in
 3. called on
@@ -197,6 +205,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 5. called off
 
 21. Explanations given to the patient by the anesthetist prior to surgery often ____ anxiety and ____ the need for analgesics or painkillers.
+
 1. ignore - prevent
 2. relieve - reduce
 3. explore - prepare
@@ -206,6 +215,7 @@ Choose the best alternative to make the sentence(s) meaningful.
 
 part_6 = '''
 22. According to Hume, it is not logic that determines what we say and do; if we decide to help a person in need, we do so because of our ____, not our ____.
+
 1. concern - kindness
 2. duty - rights
 3. beliefs - convictions
@@ -213,6 +223,7 @@ part_6 = '''
 5. consciousness - emotions
 
 23. Although they are ____ by traps, poison, and shotguns, predators ____ to feast on flocks of sheep.
+
 1. lured - refuse
 2. harmed - hesitate
 3. destroyed - cease
@@ -220,6 +231,7 @@ part_6 = '''
 5. encouraged - attempt
 
 24. Employers who retire people who are willing and able to continue working should realize that ____ age is not an effective ____ in determining whether an individual is capable of working.
+
 1. physical - barrier
 2. advanced - method
 3. intellectual - factor
@@ -227,6 +239,7 @@ part_6 = '''
 5. chronological - criterion
 
 25. Using computer labs to ____ classroom instruction is most effective when the curriculum ____ lab exercises and classroom teaching in a coordinated manner.
+
 1. foster - curtails
 2. supplement - integrates
 3. minimize - reinforces
@@ -239,6 +252,7 @@ Items 26-30: Meaning Recognition
 Choose the alternative which has the same meaning as the underlined word in the given sentence.
 
 26. Most customers were satisfied with the way their complaints were handled.
+
 1. Computers can handle huge amounts of data.
 2. She cannot handle it when people criticize her.
 3. Please handle the fruit carefully or it will bruise.
@@ -246,6 +260,7 @@ Choose the alternative which has the same meaning as the underlined word in the 
 5. We teach the children to handle the animals gently.
 
 27. The principal took the position that the students did not need music classes.
+
 1. All parking signs have now been placed in position.
 2. My elder brother is thinking of applying for that position.
 3. No one was sure of the chairperson's position on any issue.
@@ -253,6 +268,7 @@ Choose the alternative which has the same meaning as the underlined word in the 
 5. John took up his new position as sales manager in September.
 
 28. The Bureau is active in promoting overseas investment.
+
 1. The virus is active even at low temperatures.
 2. This lady took an active interest in local charities.
 3. The disease remains active throughout the patient's life.
@@ -260,6 +276,7 @@ Choose the alternative which has the same meaning as the underlined word in the 
 5. The volcano became active last year with a series of eruptions.
 
 29. He was surprised to learn that she was a lot older than he had thought.
+
 1. Your homework for today is to learn the periodic table.
 2. We learned about our appointment by telephone yesterday.
 3. They have to learn that they cannot just do whatever they like.
@@ -267,6 +284,7 @@ Choose the alternative which has the same meaning as the underlined word in the 
 5. Youngsters must learn what is dangerous and what is not to be feared.
 
 30. The data will cover things such as water currents and wind direction.
+
 1. Strong currents can be very dangerous for swimmers.
 2. There was a strong current of opinion in favor of war.
 3. The student movement formed a distinct current of protest.
