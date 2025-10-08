@@ -14,6 +14,7 @@ Choose the best answer.
 
 1. A: Could I use your phone for a moment?
    B: ____. Help yourself.
+
    1. By all means
    2. Not at all
    3. I'm afraid not
@@ -22,6 +23,7 @@ Choose the best answer.
 
 2. A: I think I have an appointment with Mr. Johnson at 3 p.m. today. Is that right?
    B: ____, please. Let me check the timetable first. Yes, that's right.
+
    1. Hold up
    2. Hang up
    3. Hold on
@@ -31,6 +33,7 @@ Choose the best answer.
 3. A: That salad was delicious. ____?
    B: Oh, it's very easy. Do you want to write it down?
    A: Yes, I will.
+
    1. How is it
    2. How do you make it
    3. How do you do it
@@ -40,6 +43,7 @@ Choose the best answer.
 4. A: I heard that there's a big sale this weekend. Do you want to go shopping?
    B: ____. I'm broke.
    A: Well, we can still do some window shopping, can't we?
+
    1. I feel bad
    2. I don't care
    3. I'd love to
