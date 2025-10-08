@@ -1,9 +1,11 @@
 import sys
+import textwrap
 from pathlib import Path
 from typing import List
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
+from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 
 # Импортируем тексты из соседнего файла с пунктуацией
@@ -37,7 +39,10 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
     margin_x, margin_y = 20 * mm, 20 * mm
     line_height = 14
     c.setFont("Courier", 11)
-
+    # рассчитаем максимально допустимое количество символов в строке для правого отступа
+    char_w = pdfmetrics.stringWidth("M", "Courier", 11)
+    max_width = w - 2 * margin_x
+    max_chars = max(1, int(max_width // char_w))
     for i, block in enumerate(blocks, start=1):
         y = h - margin_y
         for line in block.splitlines():
@@ -48,12 +53,19 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
                     c.setFont("Courier", 11);
                     y = h - margin_y
                 continue
-            if y < margin_y:
-                c.showPage();
-                c.setFont("Courier", 11);
-                y = h - margin_y
-            c.drawString(margin_x, y, line)
-            y -= line_height
+            # перенос по правому краю с тем же отступом, используя моноширинный шрифт
+            wrapped_lines = textwrap.wrap(line, width=max_chars,
+                                          break_long_words=True,
+                                          break_on_hyphens=False)
+            if not wrapped_lines:
+                wrapped_lines = [""]
+            for seg in wrapped_lines:
+                if y < margin_y:
+                    c.showPage();
+                    c.setFont("Courier", 11);
+                    y = h - margin_y
+                c.drawString(margin_x, y, seg)
+                y -= line_height
         if i < len(blocks):
             c.showPage();
             c.setFont("Courier", 11)
@@ -82,6 +94,6 @@ if __name__ == "__main__":
         blocks.append(page_4)
     blocks.extend([b.strip("\n") for b in other_blocks])
 
-    out_pdf = BASE_DIR / "CHA_Lesson_3_Text_grouped.pdf"
+    out_pdf = BASE_DIR / "CHA_Lesson_3_Text_grouped_wrapped.pdf"
     make_text_pdf(blocks, out_pdf)
     print(f"✅ Готово: {out_pdf.resolve()}")
