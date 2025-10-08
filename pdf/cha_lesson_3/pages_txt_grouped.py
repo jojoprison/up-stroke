@@ -1,3 +1,4 @@
+import re
 import sys
 import textwrap
 from pathlib import Path
@@ -43,6 +44,59 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
     char_w = pdfmetrics.stringWidth("M", "Courier", 11)
     max_width = w - 2 * margin_x
     max_chars = max(1, int(max_width // char_w))
+    # карта подчеркиваний для заданий 26-30 (только в строке вопроса)
+    underline_map = {
+        "26": ["handled"],
+        "27": ["position"],
+        "28": ["active"],
+        "29": ["learn"],
+        "30": ["currents"],
+    }
+
+    def wrap_with_indices(text: str, width: int) -> list[tuple[str, int]]:
+        wrapped = textwrap.wrap(text, width=width, break_long_words=True,
+                                break_on_hyphens=False)
+        segs: list[tuple[str, int]] = []
+        cursor = 0
+        for seg in wrapped:
+            start = text.find(seg, cursor)
+            if start == -1:
+                start = cursor
+            segs.append((seg, start))
+            cursor = start + len(seg)
+        if not segs:
+            segs.append(("", 0))
+        return segs
+
+    def draw_with_optional_underline(base_x: float, y_pos: float,
+                                     full_line: str, seg_text: str,
+                                     seg_start: int,
+                                     underline_words: list[str]):
+        c.drawString(base_x, y_pos, seg_text)
+        if not underline_words:
+            return
+        # найдем диапазоны в полной строке
+        ranges: list[tuple[int, int]] = []
+        for w in underline_words:
+            for m in re.finditer(rf"\b{re.escape(w)}\b", full_line,
+                                 flags=re.IGNORECASE):
+                ranges.append((m.start(), m.end()))
+        if not ranges:
+            return
+        seg_end = seg_start + len(seg_text)
+        for a, b in ranges:
+            # пересечение с текущим сегментом
+            start = max(a, seg_start)
+            end = min(b, seg_end)
+            if start >= end:
+                continue
+            rel_start = start - seg_start
+            rel_end = end - seg_start
+            x1 = base_x + rel_start * char_w
+            x2 = base_x + rel_end * char_w
+            c.setLineWidth(0.6)
+            c.line(x1, y_pos - 1.5, x2, y_pos - 1.5)
+
     for i, block in enumerate(blocks, start=1):
         y = h - margin_y
         for line in block.splitlines():
@@ -53,18 +107,22 @@ def make_text_pdf(blocks: List[str], out_path: Path) -> Path:
                     c.setFont("Courier", 11);
                     y = h - margin_y
                 continue
+            # определим, нужно ли подчеркивание (только для блока part_7 и строк 26-30)
+            underline_words: list[str] = []
+            if i == len(blocks):  # последний блок = part_7
+                m = re.match(r"\s*(\d{2})\.", line)
+                if m and m.group(1) in underline_map:
+                    underline_words = underline_map[m.group(1)]
+
             # перенос по правому краю с тем же отступом, используя моноширинный шрифт
-            wrapped_lines = textwrap.wrap(line, width=max_chars,
-                                          break_long_words=True,
-                                          break_on_hyphens=False)
-            if not wrapped_lines:
-                wrapped_lines = [""]
-            for seg in wrapped_lines:
+            wrapped_with_idx = wrap_with_indices(line, max_chars)
+            for seg_text, seg_start in wrapped_with_idx:
                 if y < margin_y:
                     c.showPage();
                     c.setFont("Courier", 11);
                     y = h - margin_y
-                c.drawString(margin_x, y, seg)
+                draw_with_optional_underline(margin_x, y, line, seg_text,
+                                             seg_start, underline_words)
                 y -= line_height
         if i < len(blocks):
             c.showPage();

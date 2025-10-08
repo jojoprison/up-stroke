@@ -102,6 +102,7 @@ Amy: Not unless you want to die!
 
 part_4 = '''
 9.
+
 1. What's the story
 2. What's missing
 3. What's the point
@@ -109,6 +110,7 @@ part_4 = '''
 5. What's the relationship
 
 10.
+
 1. let him down
 2. stand him anymore
 3. figure him out
@@ -116,6 +118,7 @@ part_4 = '''
 5. apologize to him
 
 11.
+
 1. show up
 2. step in
 3. hang in there
@@ -123,6 +126,7 @@ part_4 = '''
 5. be more patient
 
 12.
+
 1. keep my head cool
 2. keep pushing it
 3. keep my mouth shut
@@ -138,6 +142,7 @@ Gary: I hope so.
 Jan: Come on, cheer up. Don't worry so much. ____15____.
 
 13.
+
 1. I might drop out
 2. chances are probably slim
 3. I should forget about it
@@ -145,6 +150,7 @@ Jan: Come on, cheer up. Don't worry so much. ____15____.
 5. I have no opportunities
 
 14.
+
 1. I wouldn't care
 2. I wouldn't try
 3. I wouldn't bother
@@ -152,6 +158,7 @@ Jan: Come on, cheer up. Don't worry so much. ____15____.
 5. I wouldn't say that
 
 15.
+
 1. I believe in it
 2. Everything will change
 3. You're hopeless
