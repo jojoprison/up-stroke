@@ -61,7 +61,7 @@ def make_text_pdf(blocks: List[str], out_path: Path,
         "29": [r"learn(?:ed)?"],
         "30": [r"currents?"],
     }
-    compiled_ul = {k: [re.compile(rf"\\b{p}\\b", re.IGNORECASE) for p in v] for
+    compiled_ul = {k: [re.compile(rf"\b{p}\b", re.IGNORECASE) for p in v] for
                    k, v in underline_patterns_map.items()}
 
     def wrap_with_indices(text: str, width: int) -> list[tuple[str, int]]:
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     # Далее — остальное: объединяем 16–25 (part_5 + part_6) в один блок
     # и делаем ручной разрыв страницы перед 21., чтобы 21 начиналось с новой страницы,
     # а 22 и далее шли на той же странице
-    combined_16_25 = (part_5.strip("\n") + "\n" + part_6.strip("\n")).strip(
+    combined_16_25 = (part_5.strip("\n") + "\n\n" + part_6.strip("\n")).strip(
         "\n")
 
     blocks: List[str] = [page_1, page_2, page_3]
